@@ -8,4 +8,6 @@ Currently it:
 - Reduces brigthness at 78%
 - Applies a Gaussin Blur effect
 
+![Alt text](./screenshot.png?raw=true "Optional Title")
+
 TODO: enable customization of the above filters
