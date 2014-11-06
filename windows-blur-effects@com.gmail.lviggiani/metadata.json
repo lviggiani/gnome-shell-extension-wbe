@@ -1,0 +1,7 @@
+{
+    "shell-version": ["3.10","3.12","3.14"],
+    "uuid": "windows-blur-effects@com.gmail.lviggiani",
+    "name": "Windows Blur Effects",
+    "url": "https://github.com/lviggiani/gnome-shell-extension-wbe",
+    "description": "Apply effects on window blur"
+}
