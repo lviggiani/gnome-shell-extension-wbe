@@ -23,7 +23,7 @@
  * the inspiration and some code hinting from. You may find his original
  * project here:
  * 
- * https://github.com/paradoxxxzero/gnome-shell-focus-effects-applet
+ * https://github.com/paradoxxxzero/gnome-shell-focus-effects-extension
  *
  */
 
@@ -87,7 +87,6 @@ function updateApps(){
 }
 
 function updateWindows(app){
-	global.log("Processing app: " + app.get_name());
 	var windows = app.get_windows();
 	var activeActor = (display.focus_window)? display.focus_window.get_compositor_private() : null;
 	for (var co=0; co<windows.length; co++){
