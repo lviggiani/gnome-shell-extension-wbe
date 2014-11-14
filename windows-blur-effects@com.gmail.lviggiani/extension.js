@@ -33,8 +33,6 @@ const Tweener = imports.ui.tweener;
 
 const display = global.display;
 
-const windowTracker = Shell.WindowTracker.get_default();
-
 const filters = [
          { 
         	 name: "desaturate",
@@ -64,7 +62,7 @@ var isExtensionEnabled = false;
 function init(){}
 
 function enable(){
-	focusAppConnection = windowTracker.connect('notify::focus-app', updateApps);
+	focusAppConnection = global.display.connect('notify::focus-window', updateApps);
 	switchWorkspaceConnection = global.window_manager.connect('switch-workspace', updateApps);
 		
 	isExtensionEnabled = true;
@@ -72,7 +70,7 @@ function enable(){
 }
 
 function disable(){
-	windowTracker.disconnect(focusAppConnection);
+    global.display.disconnect(focusAppConnection);
     global.window_manager.disconnect(switchWorkspaceConnection);
     
 	isExtensionEnabled = false;
