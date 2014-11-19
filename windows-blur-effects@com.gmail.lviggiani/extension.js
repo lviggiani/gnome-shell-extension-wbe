@@ -19,7 +19,7 @@
  * AUTHOR: Luca Viggiani (lviggiani@gmail.com)
  * PROJECT SITE: https://github.com/lviggiani/gnome-shell-extension-wbe
  * 
- * CREDITS: credits go to  Florian Mounier aka paradoxxxzero which I got
+ * CREDITS: credits also go to  Florian Mounier aka paradoxxxzero which I got
  * the inspiration and some code hinting from. You may find his original
  * project here:
  * 
@@ -29,9 +29,12 @@
 
 const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
-const Tweener = imports.ui.tweener;
 
 const display = global.display;
+
+const excludeList = [
+                     "Gnome-terminal"
+                     ]; // an array of wm-class to be excluded from filters
 
 const filters = [
          { 
@@ -49,11 +52,12 @@ const filters = [
         	 value: new Clutter.Color({ red: 100, green: 100, blue: 100, alpha: 255}),
         	 active: true
          },
-         { name: "blur", effect: Clutter.BlurEffect, active: true}
+         { 
+        	 name: "blur",
+        	 effect: Clutter.BlurEffect,
+        	 active: true
+         }
 ];
-
-const TWEEN_TIME = 2;
-const TWEEN_TRANSITION = "easeOutQuad";
 
 var focusAppConnection, switchWorkspaceConnection;
 
@@ -87,11 +91,20 @@ function updateApps(){
 function updateWindows(app){
 	var windows = app.get_windows();
 	var activeActor = (display.focus_window)? display.focus_window.get_compositor_private() : null;
+	var activeScreen = (display.focus_window)? display.focus_window.get_screen() : null;
+		
 	for (var co=0; co<windows.length; co++){
-		var actor = windows[co].get_compositor_private();
+		var window = windows[co];
+		var actor = window.get_compositor_private();
 		if (!actor) continue;
 		
+		// Fix for issue #4: ignore windows on other screens
+		if (window.get_screen()!=activeScreen) continue;
+		
 		var flag = (actor!=activeActor) && isExtensionEnabled;
+		
+		// Fix issue #1: Exclude some windows from effects
+		flag = flag && !excludeList.contains(window.wm_class);
 		
 		applyFilters(actor, flag);
 	}
@@ -111,20 +124,18 @@ function applyFilters(actor, flag){
 				actor.remove_effect_by_name(filter.name);
 		}
 		
-		if (ff && (filter.property!=undefined) && (filter.value!=undefined) && (ff[filter.property]!=undefined)){
-			/*var o = {
-				time: TWEEN_TIME,
-                transition: TWEEN_TRANSITION
-			};
-			
-			o[filter.property] = filter.value;
-			
-			if (filter.startValue!=undefined)
-				ff[filter.property] = filter.startValue;
-			
-			Tweener.addTween(ff, o);*/
-			
+		if (ff && (filter.property!=undefined) && (filter.value!=undefined) && (ff[filter.property]!=undefined)){	
 			ff[filter.property] = filter.value;
 		}
 	}
+}
+
+Array.prototype.contains = function(obj) {
+    var i = this.length;
+    while (i--) {
+        if (this[i] === obj) {
+            return true;
+        }
+    }
+    return false;
 }

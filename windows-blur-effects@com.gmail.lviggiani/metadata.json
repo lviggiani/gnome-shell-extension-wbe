@@ -3,5 +3,5 @@
     "uuid": "windows-blur-effects@com.gmail.lviggiani",
     "name": "Windows Blur Effects",
     "url": "https://github.com/lviggiani/gnome-shell-extension-wbe",
-    "description": "Apply effects on window blur"
+    "description": "Apply effects on windows in background."
 }
