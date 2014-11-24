@@ -32,6 +32,8 @@ const Shell = imports.gi.Shell;
 
 const display = global.display;
 
+const privateExcludeList = ["Gnome-shell"]; // an array of wm-class to be excluded from filters not modifiable by user
+
 const excludeList = [
                      "Gnome-terminal"
                      ]; // an array of wm-class to be excluded from filters
@@ -108,6 +110,9 @@ function updateWindows(app){
 		
 		// Fix issue #1: Exclude some windows from effects
 		flag = flag && !excludeList.contains(window.wm_class);
+		
+		// Tentative fix for issue #5: prevent Desktop from being blurred
+		flag = flag && !privateExcludeList.contains(window.wm_class);
 		
 		applyFilters(actor, flag);
 	}
