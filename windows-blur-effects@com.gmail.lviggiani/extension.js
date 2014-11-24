@@ -59,7 +59,7 @@ const filters = [
          }
 ];
 
-var focusAppConnection, switchWorkspaceConnection;
+var focusAppConnection, switchWorkspaceConnection, trackedWindowsChangedConnection;
 
 var isExtensionEnabled = false;
 
@@ -68,7 +68,9 @@ function init(){}
 function enable(){
 	focusAppConnection = global.display.connect('notify::focus-window', updateApps);
 	switchWorkspaceConnection = global.window_manager.connect('switch-workspace', updateApps);
-		
+	trackedWindowsChangedConnection = Shell.WindowTracker.get_default().connect('tracked-windows-changed', updateApps);
+	
+	
 	isExtensionEnabled = true;
 	updateApps();
 }
@@ -76,6 +78,7 @@ function enable(){
 function disable(){
     global.display.disconnect(focusAppConnection);
     global.window_manager.disconnect(switchWorkspaceConnection);
+    Shell.WindowTracker.get_default().disconnect(trackedWindowsChangedConnection);
     
 	isExtensionEnabled = false;
 	updateApps();
@@ -91,7 +94,7 @@ function updateApps(){
 function updateWindows(app){
 	var windows = app.get_windows();
 	var activeActor = (display.focus_window)? display.focus_window.get_compositor_private() : null;
-	var activeScreen = (display.focus_window)? display.focus_window.get_screen() : null;
+	var activeMonitor = (display.focus_window)? display.focus_window.get_monitor() : -1;
 		
 	for (var co=0; co<windows.length; co++){
 		var window = windows[co];
@@ -99,7 +102,7 @@ function updateWindows(app){
 		if (!actor) continue;
 		
 		// Fix for issue #4: ignore windows on other screens
-		if (window.get_screen()!=activeScreen) continue;
+		if (window.get_monitor()!=activeMonitor) continue;
 		
 		var flag = (actor!=activeActor) && isExtensionEnabled;
 		
