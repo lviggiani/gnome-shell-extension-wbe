@@ -19,5 +19,10 @@ https://github.com/paradoxxxzero/gnome-shell-focus-effects-extension
 
 CHANGES:
 
+Version 3:
+- fixed issue #1: Ability to exclude windows
+- fixed issue #4: Added multi-display support
+- tentative fix for issue #5: prevent destkop from being blurred (e.g. with conky). For this I need testing on gnome prior to 3.14 as I cant reproduce here.
+
 Version 2: fixed issue with Windows of the same application (added patch from Kevin MacMartin, thanks dude!)
 

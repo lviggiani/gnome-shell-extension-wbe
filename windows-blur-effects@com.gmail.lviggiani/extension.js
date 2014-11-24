@@ -34,9 +34,7 @@ const display = global.display;
 
 const privateExcludeList = ["Gnome-shell"]; // an array of wm-class to be excluded from filters not modifiable by user
 
-const excludeList = [
-                     "Gnome-terminal"
-                     ]; // an array of wm-class to be excluded from filters
+const excludeList = []; // an array of wm-class to be excluded from filters
 
 const filters = [
          { 
