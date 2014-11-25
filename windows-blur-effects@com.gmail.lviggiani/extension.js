@@ -29,35 +29,16 @@
 
 const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
+const ExtensionUtils = imports.misc.extensionUtils;
 
+const extension = ExtensionUtils.getCurrentExtension();
 const display = global.display;
 
 const privateExcludeList = ["Gnome-shell"]; // an array of wm-class to be excluded from filters not modifiable by user
 
 const excludeList = []; // an array of wm-class to be excluded from filters
 
-const filters = [
-         { 
-        	 name: "desaturate",
-        	 effect: Clutter.DesaturateEffect,
-        	 property: "factor",
-        	 value: 1,
-        	 startValue: 0,
-        	 active: true
-         },
-         {
-        	 name: "brightness",
-        	 effect: Clutter.BrightnessContrastEffect,
-        	 property: "brightness",
-        	 value: new Clutter.Color({ red: 100, green: 100, blue: 100, alpha: 255}),
-        	 active: true
-         },
-         { 
-        	 name: "blur",
-        	 effect: Clutter.BlurEffect,
-        	 active: true
-         }
-];
+const filters = extension.imports.shared.filters;
 
 var focusAppConnection, switchWorkspaceConnection, trackedWindowsChangedConnection;
 
@@ -130,8 +111,12 @@ function applyFilters(actor, flag){
 				actor.remove_effect_by_name(filter.name);
 		}
 		
-		if (ff && (filter.property!=undefined) && (filter.value!=undefined) && (ff[filter.property]!=undefined)){	
-			ff[filter.property] = filter.value;
+		if (ff && (filter.methods!=undefined) && (filter.values!=undefined)
+				&& (filter.methods.length == filter.values.length)){
+			
+			for (var i=0; i<filter.methods.length; i++)
+				if (ff[filter.methods[i]]!=undefined)
+					ff[filter.methods[i]](filter.values[i]);
 		}
 	}
 }

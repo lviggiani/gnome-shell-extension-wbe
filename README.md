@@ -5,7 +5,8 @@ Apply effects on Windows in backgound (not focused).
 
 Currently it:
 - Desaturates at 100%
-- Reduces brigthness at 78%
+- Reduces brigthness by -30%
+- Reduces contrast by -30% (NEW)
 - Applies a Gaussin Blur effect
 
 ![Alt text](./screenshot.png?raw=true "Optional Title")
