@@ -36,12 +36,30 @@ const filters = extension.imports.shared.filters; //[{name:"pino"},{name:"pollo"
 function init(){}
 
 function buildPrefsWidget(){
-	var ret = new Gtk.Grid({orientation: Gtk.Orientation.VERTICAL});
+	var ret = new Gtk.Grid({orientation: Gtk.Orientation.VERTICAL, margin_bottom: 50});
 	
 	for (var co=0; co<filters.length; co++){
 		var exp = new Gtk.Expander({
 					label: filters[co].name,
-					expanded: true, margin: 6 });
+					expanded: true,
+					margin: 6,
+					hexpand: true});
+		
+		var hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 50});
+		exp.add(hbox);
+		
+		var sw = new Gtk.Switch({ active: filters[co].active, halign: Gtk.Align.END, valign: Gtk.Align.START });
+		hbox.pack_end(sw, false, false, 0);
+		
+		if (filters[co].widgets){
+			for (var i=0; i<filters[co].widgets.length; i++){
+				var w = filters[co].widgets[i]();
+				w.set_value(filters[co].values[i]);
+				
+				hbox.pack_start(w,true,true,0);
+			}
+		}
+		
 		ret.add(exp);
 	}
 
