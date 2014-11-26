@@ -1,6 +1,11 @@
 const Clutter = imports.gi.Clutter;
 const Gtk = imports.gi.Gtk;
 
+const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
+
+const SCHEMA_NAME = "org.gnome.shell.extensions.wbe";
+
 const filters = [
          { 
         	 name: "Desaturate",
@@ -31,4 +36,25 @@ function createBnCWidget(){
 
 function createDesaturateWidget(){
 	return Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL,0.0,1.0,0.01);
+}
+
+function getSettings(schemaName, schemaDir) {
+
+    // Extension installed in .local
+    if (GLib.file_test(schemaDir + '/' + schemaName + ".gschema.xml", GLib.FileTest.EXISTS)) {
+    	var schemaSource = Gio.SettingsSchemaSource.new_from_directory(schemaDir,
+                                  Gio.SettingsSchemaSource.get_default(),
+                                  false);
+    	var schema = schemaSource.lookup(schemaName, false);
+
+        return new Gio.Settings({ settings_schema: schema });
+    }
+    /*
+    // Extension installed system-wide
+    else {
+        if (Gio.Settings.list_schemas().indexOf(schemaName) == -1)
+            throw "Schema \"%s\" not found.".format(schemaName);
+        return new Gio.Settings({ schema: schemaName });
+    }
+    */
 }

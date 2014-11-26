@@ -32,6 +32,8 @@ const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
 
 const extension = ExtensionUtils.getCurrentExtension();
+const Shared = extension.imports.shared;
+
 const display = global.display;
 
 const privateExcludeList = ["Gnome-shell"]; // an array of wm-class to be excluded from filters not modifiable by user
@@ -40,17 +42,25 @@ const excludeList = []; // an array of wm-class to be excluded from filters
 
 const filters = extension.imports.shared.filters;
 
-var focusAppConnection, switchWorkspaceConnection, trackedWindowsChangedConnection;
+var focusAppConnection, switchWorkspaceConnection, trackedWindowsChangedConnection, settingChangedConnection;
 
 var isExtensionEnabled = false;
+
+const settings = Shared.getSettings(Shared.SCHEMA_NAME, extension.dir.get_child('schemas').get_path());
 
 function init(){}
 
 function enable(){
+	loadSettings();
+	
 	focusAppConnection = global.display.connect('notify::focus-window', updateApps);
 	switchWorkspaceConnection = global.window_manager.connect('switch-workspace', updateApps);
 	trackedWindowsChangedConnection = Shell.WindowTracker.get_default().connect('tracked-windows-changed', updateApps);
 	
+	settingChangedConnection = settings.connect("changed", function(){
+		loadSettings();
+		updateApps();
+	});
 	
 	isExtensionEnabled = true;
 	updateApps();
@@ -60,6 +70,7 @@ function disable(){
     global.display.disconnect(focusAppConnection);
     global.window_manager.disconnect(switchWorkspaceConnection);
     Shell.WindowTracker.get_default().disconnect(trackedWindowsChangedConnection);
+    settings.disconnect(settingChangedConnection);
     
 	isExtensionEnabled = false;
 	updateApps();
@@ -97,12 +108,17 @@ function updateWindows(app){
 	}
 }
 
-function applyFilters(actor, flag){
+function applyFilters(actor, fl){
+	
 	for (var co=0; co<filters.length; co++){
+		var flag = fl;
+		
 		var filter = filters[co];
+		
 		flag = flag && filter.active;
 		
 		var ff = actor.get_effect(filter.name);
+		
 		if (flag){
 			if (!ff)
 				actor.add_effect_with_name(filter.name, (ff = new filter.effect()));
@@ -117,6 +133,24 @@ function applyFilters(actor, flag){
 			for (var i=0; i<filter.methods.length; i++)
 				if (ff[filter.methods[i]]!=undefined)
 					ff[filter.methods[i]](filter.values[i]);
+		}
+	}
+}
+
+function loadSettings(){
+	
+	for (var co=0; co<filters.length; co++){
+		var filter = filters[co];
+		var key = filter.name.toLowerCase().replace(/\s/g, "-");
+		filter.active = settings.get_boolean(key);
+		
+		if (filter.methods){
+			for (var i=0; i<filter.methods.length; i++){
+				var kk = key + "-" + filter.methods[i].toLowerCase().replace(/[\s|_]/g, "-");
+				
+				// FIXME: I'm assuming datatype is double. There should be a way to check this first
+				filter.values[i] = settings.get_double(kk);
+			}
 		}
 	}
 }

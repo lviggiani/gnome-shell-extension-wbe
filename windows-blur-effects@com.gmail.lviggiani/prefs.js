@@ -31,11 +31,15 @@ const Gtk = imports.gi.Gtk;
 const ExtensionUtils = imports.misc.extensionUtils;
 
 const extension = ExtensionUtils.getCurrentExtension();
-const filters = extension.imports.shared.filters; //[{name:"pino"},{name:"pollo"}];
+const Shared = extension.imports.shared;
+const filters = Shared.filters;
 
 function init(){}
 
 function buildPrefsWidget(){
+	
+	var settings = Shared.getSettings(Shared.SCHEMA_NAME, extension.dir.get_child('schemas').get_path());
+	
 	var ret = new Gtk.Grid({orientation: Gtk.Orientation.VERTICAL, margin_bottom: 50});
 	
 	for (var co=0; co<filters.length; co++){
@@ -48,21 +52,57 @@ function buildPrefsWidget(){
 		var hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 50});
 		exp.add(hbox);
 		
-		var sw = new Gtk.Switch({ active: filters[co].active, halign: Gtk.Align.END, valign: Gtk.Align.START });
+		var key = filters[co].name.toLowerCase().replace(/\s/g, "-");
+		
+		var sw = new Gtk.Switch({ 
+			active: settings.get_boolean(key), 
+			halign: Gtk.Align.END, valign: Gtk.Align.START });
+		
+		sw.name = key;
+		
+		sw.connect("notify::active", function(widget){
+			settings.set_boolean(widget.name, widget.active);
+			enableGroup(widget);
+		});
+		
 		hbox.pack_end(sw, false, false, 0);
 		
 		if (filters[co].widgets){
 			for (var i=0; i<filters[co].widgets.length; i++){
 				var w = filters[co].widgets[i]();
-				w.set_value(filters[co].values[i]);
+				
+				var kk = key + "-" + filters[co].methods[i].toLowerCase().replace(/[\s|_]/g, "-");
+				w.name = kk;
+				
+				switch (w.constructor.name){
+				case "Gtk_Scale":
+					w.set_value(settings.get_double(kk));
+					w.connect('format-value', function(widget, value){
+						return Math.round(value * 100) + "%";
+					});
+					
+					w.connect('value-changed', function(widget){
+						settings.set_double(widget.name, widget.get_value());
+					});
+					break;
+				}
 				
 				hbox.pack_start(w,true,true,0);
 			}
 		}
+		
+		enableGroup(sw);
 		
 		ret.add(exp);
 	}
 
 	ret.show_all();
 	return ret;
+}
+
+function enableGroup(widget){
+	widget.parent.foreach(function(w){
+		if (w!=widget)
+			w.sensitive = widget.active;
+	});
 }
