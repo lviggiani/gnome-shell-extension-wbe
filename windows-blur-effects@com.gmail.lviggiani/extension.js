@@ -30,14 +30,14 @@
 const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
+const Meta = imports.gi.Meta;
 
 const extension = ExtensionUtils.getCurrentExtension();
 const Shared = extension.imports.shared;
 
 const display = global.display;
 
-const privateExcludeList = ["Gnome-shell"]; // an array of wm-class to be excluded from filters not modifiable by user
-
+const specialApps = /(Gimp.*)/; // Regexp for wm-classes to exclude form effects
 const excludeList = []; // an array of wm-class to be excluded from filters
 
 const filters = extension.imports.shared.filters;
@@ -102,7 +102,17 @@ function updateWindows(app){
 		flag = flag && !excludeList.contains(window.wm_class);
 		
 		// Tentative fix for issue #5: prevent Desktop from being blurred
-		flag = flag && !privateExcludeList.contains(window.wm_class);
+		flag = flag && (window.window_type!=Meta.WindowType.DESKTOP);
+		
+		
+		// Prevent App root window from being blurred if a child window (e.g popup) is focused
+		// This fixes issue with non Gtk application (e.g. wine apps)
+		if (display.focus_window && display.focus_window.find_root_ancestor()==window)
+			flag = false;
+		
+		// Exclude some special apps (e.g. Gimp)
+		if (display.focus_window && display.focus_window.wm_class.match(specialApps))
+			flag = flag && !window.wm_class.match(specialApps);
 		
 		applyFilters(actor, flag);
 	}

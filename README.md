@@ -18,6 +18,10 @@ https://github.com/paradoxxxzero/gnome-shell-focus-effects-extension
 
 CHANGES:
 
+Version 5:
+- Fixed behaviour with child windows
+- Added suppor to other cases (e.g. Gimp in multi window mode)
+
 Version 4:
 - fixed issue #6: implemented user preferences
 - bug fixes
