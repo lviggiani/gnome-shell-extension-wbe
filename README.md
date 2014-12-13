@@ -9,12 +9,17 @@ Currently it:
 - Reduces contrast by -30% (NEW)
 - Applies a Gaussin Blur effect
 
+Please report any bugs and/or feature requests here:
+
+https://github.com/lviggiani/gnome-shell-extension-wbe/issues
+
 ![Alt text](./screenshot.png?raw=true "Optional Title")
 
 Credits: credits also go to  Florian Mounier aka paradoxxxzero which I got the inspiration and some code hinting from.
 You may find his original project here:
 
 https://github.com/paradoxxxzero/gnome-shell-focus-effects-extension
+(please do not report any issues on this)
 
 CHANGES:
 
