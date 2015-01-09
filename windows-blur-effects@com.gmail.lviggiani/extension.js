@@ -104,7 +104,9 @@ function updateWindows(app){
 		// Tentative fix for issue #5: prevent Desktop from being blurred
 		flag = flag && (window.window_type!=Meta.WindowType.DESKTOP);
 		
-		
+                // Skip always-above windows
+                flag = flag && (window.above!=true);
+
 		// Prevent App root window from being blurred if a child window (e.g popup) is focused
 		// This fixes issue with non Gtk application (e.g. wine apps)
 		if (display.focus_window && display.focus_window.find_root_ancestor()==window)
