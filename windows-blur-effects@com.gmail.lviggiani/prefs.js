@@ -31,10 +31,17 @@ const Gtk = imports.gi.Gtk;
 const ExtensionUtils = imports.misc.extensionUtils;
 
 const extension = ExtensionUtils.getCurrentExtension();
+
+const Gettext = imports.gettext.domain('windows-blur-effects');
+const _ = Gettext.gettext;
+const Convenience = extension.imports.convenience;
+
 const Shared = extension.imports.shared;
 const filters = Shared.filters;
 
-function init(){}
+function init(){
+	Convenience.initTranslations("windows-blur-effects");
+}
 
 function buildPrefsWidget(){
 	
@@ -44,7 +51,7 @@ function buildPrefsWidget(){
 	
 	for (var co=0; co<filters.length; co++){
 		var exp = new Gtk.Expander({
-					label: filters[co].name,
+					label: _(filters[co].name),
 					expanded: true,
 					margin: 6,
 					hexpand: true});
