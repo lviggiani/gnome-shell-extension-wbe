@@ -23,6 +23,11 @@ https://github.com/paradoxxxzero/gnome-shell-focus-effects-extension
 
 CHANGES:
 
+Version 6:
+- Skip aways above windows (Felipe Morales)
+- Skip vertically maximized windows (Felipe Morales)
+- Multilanguage support and German translation (Jonnius)
+
 Version 5:
 - Fixed behaviour with child windows
 - Added suppor to other cases (e.g. Gimp in multi window mode)
