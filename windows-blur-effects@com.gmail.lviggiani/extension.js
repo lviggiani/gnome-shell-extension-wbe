@@ -99,7 +99,7 @@ function updateWindows(app){
 		var flag = (actor!=activeActor) && isExtensionEnabled;
 		
 		// Fix issue #1: Exclude some windows from effects
-		flag = flag && !excludeList.contains(window.wm_class);
+		flag = flag && excludeList.indexOf(window.wm_class) < 0;
 		
 		// Tentative fix for issue #5: prevent Desktop from being blurred
 		flag = flag && (window.window_type!=Meta.WindowType.DESKTOP);
@@ -170,12 +170,3 @@ function loadSettings(){
 	}
 }
 
-Array.prototype.contains = function(obj) {
-    var i = this.length;
-    while (i--) {
-        if (this[i] === obj) {
-            return true;
-        }
-    }
-    return false;
-}
