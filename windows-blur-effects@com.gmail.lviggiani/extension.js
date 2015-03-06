@@ -110,10 +110,10 @@ function updateWindows(app){
 		// Skip always-above windows
         flag = flag && (window.above!=true);
 
-		// Prevent App root window from being blurred if a child window (e.g popup) is focused
-		// This fixes issue with non Gtk application (e.g. wine apps)
-		if (display.focus_window && display.focus_window.find_root_ancestor()==window)
+        // Do not blur windows of the same App
+		if (display.focus_window && window.find_root_ancestor()==display.focus_window.find_root_ancestor())
 			flag = false;
+		
 		
 		// Exclude some special apps (e.g. Gimp)
 		if (display.focus_window && display.focus_window.wm_class.match(specialApps))

@@ -23,6 +23,10 @@ https://github.com/paradoxxxzero/gnome-shell-focus-effects-extension
 
 CHANGES:
 
+Version 7:
+- Fixed the issue causing troubles to other extensions (thanks to UshakovVasilii patch)
+- Do not blur any windows belonging to the active App
+
 Version 6:
 - Skip aways above windows (Felipe Morales)
 - Skip vertically maximized windows (Felipe Morales)
