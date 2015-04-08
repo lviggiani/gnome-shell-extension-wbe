@@ -39,70 +39,84 @@ const Convenience = extension.imports.convenience;
 const Shared = extension.imports.shared;
 const filters = Shared.filters;
 
+const settings = Shared.getSettings(Shared.SCHEMA_NAME, extension.dir.get_child('schemas').get_path());
+
 function init(){
 	Convenience.initTranslations("windows-blur-effects");
 }
 
-function buildPrefsWidget(){
+function addPrefWidget(parent, key, label, widgets, methods){
 	
-	var settings = Shared.getSettings(Shared.SCHEMA_NAME, extension.dir.get_child('schemas').get_path());
+	var exp = new Gtk.Expander({
+		label : label,
+		expanded : true,
+		margin : 6,
+		hexpand : true
+	});
+
+	var hbox = new Gtk.Box({
+		orientation : Gtk.Orientation.HORIZONTAL,
+		spacing : 50
+	});
+	exp.add(hbox);
+
+	var sw = new Gtk.Switch({
+		active : settings.get_boolean(key),
+		halign : Gtk.Align.END,
+		valign : Gtk.Align.START
+	});
+
+	sw.name = key;
+
+	sw.connect("notify::active", function(widget) {
+		settings.set_boolean(widget.name, widget.active);
+		enableGroup(widget);
+	});
+
+	hbox.pack_end(sw, false, false, 0);
+
+	if (widgets) {
+		for (var i = 0; i < widgets.length; i++) {
+			var w = widgets[i]();
+
+			var kk = key
+					+ "-"
+					+ methods[i].toLowerCase().replace(/[\s|_]/g,
+							"-");
+			w.name = kk;
+
+			switch (w.constructor.name) {
+			case "Gtk_Scale":
+				w.set_value(settings.get_double(kk));
+				w.connect('format-value', function(widget, value) {
+					return Math.round(value * 100) + "%";
+				});
+
+				w.connect('value-changed', function(widget) {
+					settings.set_double(widget.name, widget.get_value());
+				});
+				break;
+			}
+
+			hbox.pack_start(w, true, true, 0);
+		}
+	}
+
+	enableGroup(sw);
+
+	parent.add(exp);
+}
+
+function buildPrefsWidget(){
 	
 	var ret = new Gtk.Grid({orientation: Gtk.Orientation.VERTICAL, margin_bottom: 50});
 	
 	for (var co=0; co<filters.length; co++){
-		var exp = new Gtk.Expander({
-					label: _(filters[co].name),
-					expanded: true,
-					margin: 6,
-					hexpand: true});
-		
-		var hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 50});
-		exp.add(hbox);
-		
 		var key = filters[co].name.toLowerCase().replace(/\s/g, "-");
-		
-		var sw = new Gtk.Switch({ 
-			active: settings.get_boolean(key), 
-			halign: Gtk.Align.END, valign: Gtk.Align.START });
-		
-		sw.name = key;
-		
-		sw.connect("notify::active", function(widget){
-			settings.set_boolean(widget.name, widget.active);
-			enableGroup(widget);
-		});
-		
-		hbox.pack_end(sw, false, false, 0);
-		
-		if (filters[co].widgets){
-			for (var i=0; i<filters[co].widgets.length; i++){
-				var w = filters[co].widgets[i]();
-				
-				var kk = key + "-" + filters[co].methods[i].toLowerCase().replace(/[\s|_]/g, "-");
-				w.name = kk;
-				
-				switch (w.constructor.name){
-				case "Gtk_Scale":
-					w.set_value(settings.get_double(kk));
-					w.connect('format-value', function(widget, value){
-						return Math.round(value * 100) + "%";
-					});
-					
-					w.connect('value-changed', function(widget){
-						settings.set_double(widget.name, widget.get_value());
-					});
-					break;
-				}
-				
-				hbox.pack_start(w,true,true,0);
-			}
-		}
-		
-		enableGroup(sw);
-		
-		ret.add(exp);
+		addPrefWidget(ret, key, filters[co].name, filters[co].widgets, filters[co].methods);
 	}
 
+	addPrefWidget(ret, "overview", "Apply to Overview", null, null);
 	ret.show_all();
 	return ret;
 }

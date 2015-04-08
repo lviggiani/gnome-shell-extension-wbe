@@ -31,6 +31,8 @@ const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Meta = imports.gi.Meta;
+const Main = imports.ui.main;
+//const Overview = imports.ui.overview;
 
 const extension = ExtensionUtils.getCurrentExtension();
 const Shared = extension.imports.shared;
@@ -48,6 +50,8 @@ var isExtensionEnabled = false;
 
 const settings = Shared.getSettings(Shared.SCHEMA_NAME, extension.dir.get_child('schemas').get_path());
 
+const _shadeBackgrounds = Main.overview._shadeBackgrounds;
+
 function init(){}
 
 function enable(){
@@ -60,10 +64,16 @@ function enable(){
 	settingChangedConnection = settings.connect("changed", function(){
 		loadSettings();
 		updateApps();
+		
+		updateOverviewBackground(false);
+		setOverviewBackgroundFilter(true);
 	});
 	
 	isExtensionEnabled = true;
 	updateApps();
+	
+	setOverviewBackgroundFilter(true);
+	
 }
 
 function disable(){
@@ -74,6 +84,27 @@ function disable(){
     
 	isExtensionEnabled = false;
 	updateApps();
+	
+	setOverviewBackgroundFilter(false);
+	
+}
+
+function setOverviewBackgroundFilter(flag){
+	flag &= settings.get_boolean("overview");
+	if (flag){
+		Main.overview._shadeBackgrounds = function(){};
+		updateOverviewBackground(true);
+	} else {
+		Main.overview._shadeBackgrounds = _shadeBackgrounds;
+		updateOverviewBackground(false);
+	}
+}
+
+function updateOverviewBackground(flag){
+	var o = Main.overview;
+	var backgrounds = o._backgroundGroup.get_children();
+	for (var co=0; co<backgrounds.length; co++)
+		applyFilters(backgrounds[co], flag);
 }
 
 function updateApps(){
