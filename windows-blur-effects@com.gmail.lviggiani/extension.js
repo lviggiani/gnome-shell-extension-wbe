@@ -44,7 +44,8 @@ const excludeList = []; // an array of wm-class to be excluded from filters
 
 const filters = extension.imports.shared.filters;
 
-var focusAppConnection, switchWorkspaceConnection, trackedWindowsChangedConnection, settingChangedConnection;
+var focusAppConnection, switchWorkspaceConnection, trackedWindowsChangedConnection,
+	settingChangedConnection, overviewShowingConnection, overviewHidingConnection;
 
 var isExtensionEnabled = false;
 
@@ -65,14 +66,21 @@ function enable(){
 		loadSettings();
 		updateApps();
 		
-		updateOverviewBackground(false);
+		overrideOverviewShadeBackgrounds(true);
+	});
+	
+	overviewShowingConnection = Main.overview.connect("showing", function(){
 		setOverviewBackgroundFilter(true);
+	});
+	
+	overviewHidingConnection = Main.overview.connect("hidden", function(){
+		setOverviewBackgroundFilter(false);
 	});
 	
 	isExtensionEnabled = true;
 	updateApps();
 	
-	setOverviewBackgroundFilter(true);
+	overrideOverviewShadeBackgrounds(true);
 	
 }
 
@@ -82,20 +90,30 @@ function disable(){
     Shell.WindowTracker.get_default().disconnect(trackedWindowsChangedConnection);
     settings.disconnect(settingChangedConnection);
     
+    Main.overview.disconnect(overviewShowingConnection);
+    Main.overview.disconnect(overviewHidingConnection);
+    
 	isExtensionEnabled = false;
 	updateApps();
 	
-	setOverviewBackgroundFilter(false);
+	overrideOverviewShadeBackgrounds(false);
 	
+}
+
+function overrideOverviewShadeBackgrounds(flag){
+	flag &= settings.get_boolean("overview");
+	if (flag) {
+		Main.overview._shadeBackgrounds = function(){};
+	} else {
+		Main.overview._shadeBackgrounds = _shadeBackgrounds;
+	}	
 }
 
 function setOverviewBackgroundFilter(flag){
 	flag &= settings.get_boolean("overview");
 	if (flag){
-		Main.overview._shadeBackgrounds = function(){};
 		updateOverviewBackground(true);
 	} else {
-		Main.overview._shadeBackgrounds = _shadeBackgrounds;
 		updateOverviewBackground(false);
 	}
 }
