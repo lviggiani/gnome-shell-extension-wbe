@@ -4,11 +4,14 @@ const Gtk = imports.gi.Gtk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 
+const Gettext = imports.gettext.domain('windows-blur-effects');
+const _ = Gettext.gettext;
+
 const SCHEMA_NAME = "org.gnome.shell.extensions.wbe";
 
 const filters = [
          { 
-        	 name: "Desaturate",
+        	 name: _("Desaturate"),
         	 effect: Clutter.DesaturateEffect,
         	 methods: ["set_factor"],
         	 values: [1],
@@ -16,7 +19,7 @@ const filters = [
         	 active: true
          },
          {
-        	 name: "Brightness and Contrast",
+        	 name: _("Brightness and Contrast"),
         	 effect: Clutter.BrightnessContrastEffect,
         	 methods: ["set_brightness", "set_contrast"],
         	 values: [-0.3, -0.3],
@@ -24,7 +27,7 @@ const filters = [
         	 active: true
          },
          { 
-        	 name: "Blur",
+        	 name: _("Blur"),
         	 effect: Clutter.BlurEffect,
         	 active: true
          }
