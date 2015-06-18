@@ -3,11 +3,11 @@ gnome-shell-extension-wbe
 
 Apply effects on Windows in backgound (not focused).
 
-Currently it:
-- Desaturates at 100%
-- Reduces brigthness by -30%
-- Reduces contrast by -30% (NEW)
-- Applies a Gaussin Blur effect
+- Desaturation filter 0 to 100%
+- Brightness adjustment -100% to 100%
+- Contrast adjustment -100% to 100%
+- Blur effect
+- NEW: apply filters in Overview mode
 
 Please report any bugs and/or feature requests here:
 
@@ -22,6 +22,18 @@ https://github.com/paradoxxxzero/gnome-shell-focus-effects-extension
 (please do not report any issues on this)
 
 CHANGES:
+
+Version 8:
+- Apply filters to the Overview mode desktop
+
+Version 7:
+- Fixed the issue causing troubles to other extensions (thanks to UshakovVasilii patch)
+- Do not blur any windows belonging to the active App
+
+Version 6:
+- Skip aways above windows (Felipe Morales)
+- Skip vertically maximized windows (Felipe Morales)
+- Multilanguage support and German translation (Jonnius)
 
 Version 5:
 - Fixed behaviour with child windows

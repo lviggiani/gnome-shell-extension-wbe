@@ -31,6 +31,8 @@ const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Meta = imports.gi.Meta;
+const Main = imports.ui.main;
+//const Overview = imports.ui.overview;
 
 const extension = ExtensionUtils.getCurrentExtension();
 const Shared = extension.imports.shared;
@@ -42,11 +44,14 @@ const excludeList = []; // an array of wm-class to be excluded from filters
 
 const filters = extension.imports.shared.filters;
 
-var focusAppConnection, switchWorkspaceConnection, trackedWindowsChangedConnection, settingChangedConnection;
+var focusAppConnection, switchWorkspaceConnection, trackedWindowsChangedConnection,
+	settingChangedConnection, overviewShowingConnection, overviewHidingConnection;
 
 var isExtensionEnabled = false;
 
 const settings = Shared.getSettings(Shared.SCHEMA_NAME, extension.dir.get_child('schemas').get_path());
+
+const _shadeBackgrounds = Main.overview._shadeBackgrounds;
 
 function init(){}
 
@@ -60,10 +65,23 @@ function enable(){
 	settingChangedConnection = settings.connect("changed", function(){
 		loadSettings();
 		updateApps();
+		
+		overrideOverviewShadeBackgrounds(true);
+	});
+	
+	overviewShowingConnection = Main.overview.connect("showing", function(){
+		setOverviewBackgroundFilter(true);
+	});
+	
+	overviewHidingConnection = Main.overview.connect("hidden", function(){
+		setOverviewBackgroundFilter(false);
 	});
 	
 	isExtensionEnabled = true;
 	updateApps();
+	
+	overrideOverviewShadeBackgrounds(true);
+	
 }
 
 function disable(){
@@ -72,8 +90,39 @@ function disable(){
     Shell.WindowTracker.get_default().disconnect(trackedWindowsChangedConnection);
     settings.disconnect(settingChangedConnection);
     
+    Main.overview.disconnect(overviewShowingConnection);
+    Main.overview.disconnect(overviewHidingConnection);
+    
 	isExtensionEnabled = false;
 	updateApps();
+	
+	overrideOverviewShadeBackgrounds(false);
+	
+}
+
+function overrideOverviewShadeBackgrounds(flag){
+	flag &= settings.get_boolean("overview");
+	if (flag) {
+		Main.overview._shadeBackgrounds = function(){};
+	} else {
+		Main.overview._shadeBackgrounds = _shadeBackgrounds;
+	}	
+}
+
+function setOverviewBackgroundFilter(flag){
+	flag &= settings.get_boolean("overview");
+	if (flag){
+		updateOverviewBackground(true);
+	} else {
+		updateOverviewBackground(false);
+	}
+}
+
+function updateOverviewBackground(flag){
+	var o = Main.overview;
+	var backgrounds = o._backgroundGroup.get_children();
+	for (var co=0; co<backgrounds.length; co++)
+		applyFilters(backgrounds[co], flag);
 }
 
 function updateApps(){
@@ -99,18 +148,21 @@ function updateWindows(app){
 		var flag = (actor!=activeActor) && isExtensionEnabled;
 		
 		// Fix issue #1: Exclude some windows from effects
-		flag = flag && !excludeList.contains(window.wm_class);
+		flag = flag && excludeList.indexOf(window.wm_class) < 0;
 		
 		// Tentative fix for issue #5: prevent Desktop from being blurred
 		flag = flag && (window.window_type!=Meta.WindowType.DESKTOP);
 		
-                // Skip always-above windows
-                flag = flag && (window.above!=true);
+		// Fix issue #11: Prevent vertically maximized windows from being blurred
+		flag = flag && (window.get_maximized()!=Meta.MaximizeFlags.VERTICAL);
+		
+		// Skip always-above windows
+        flag = flag && (window.above!=true);
 
-		// Prevent App root window from being blurred if a child window (e.g popup) is focused
-		// This fixes issue with non Gtk application (e.g. wine apps)
-		if (display.focus_window && display.focus_window.find_root_ancestor()==window)
+        // Do not blur windows of the same App
+		if (display.focus_window && window.find_root_ancestor()==display.focus_window.find_root_ancestor())
 			flag = false;
+		
 		
 		// Exclude some special apps (e.g. Gimp)
 		if (display.focus_window && display.focus_window.wm_class.match(specialApps))
@@ -167,12 +219,3 @@ function loadSettings(){
 	}
 }
 
-Array.prototype.contains = function(obj) {
-    var i = this.length;
-    while (i--) {
-        if (this[i] === obj) {
-            return true;
-        }
-    }
-    return false;
-}

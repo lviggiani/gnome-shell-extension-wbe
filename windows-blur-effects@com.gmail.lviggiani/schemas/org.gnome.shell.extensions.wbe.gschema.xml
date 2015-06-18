@@ -36,5 +36,12 @@
         	<summary>Applies a Clutter Blur effect</summary>
         	<description>Applies a Clutter Blur effect</description>
     	</key>
+    	
+    	<!-- Overview -->
+    	<key type="b" name="overview">
+        	<default>true</default>
+        	<summary>Applies the effects to the Overview background</summary>
+        	<description>Applies the effects to the Overview background</description>
+    	</key>
 	</schema>
 </schemalist>
