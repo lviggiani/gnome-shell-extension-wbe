@@ -48,7 +48,7 @@ function init(){
 function addPrefWidget(parent, key, label, widgets, methods){
 	
 	var exp = new Gtk.Expander({
-		label : label,
+		label : _(label),
 		expanded : true,
 		margin : 6,
 		hexpand : true
@@ -116,7 +116,7 @@ function buildPrefsWidget(){
 		addPrefWidget(ret, key, filters[co].name, filters[co].widgets, filters[co].methods);
 	}
 
-	addPrefWidget(ret, "overview", "Apply to Overview", null, null);
+	addPrefWidget(ret, "overview", _("Apply to Overview"), null, null);
 	ret.show_all();
 	return ret;
 }
