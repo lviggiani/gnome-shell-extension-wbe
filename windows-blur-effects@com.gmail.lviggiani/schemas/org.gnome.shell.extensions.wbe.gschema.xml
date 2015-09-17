@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="gnome-shell-extensions-wbe-daemon">
-	<schema path="/org/gnome/shell/extensions/wbe/" id="org.gnome.shell.extensions.wbe">
-	    <!-- Desature -->
-		<key type="b" name="desaturate">
-        	<default>true</default>
-        	<summary>Applies a Clutter Desaturate effect</summary>
-        	<description>Applies a Clutter Desaturate effect</description>
-    	</key>
-    	<key type="d" name="desaturate-set-factor">
-        	<default>1</default>
-        	<summary>Desature factor</summary>
-        	<description>Desature factor (0=none; 1=full)</description>
-    	</key>
-    	
-    	<!-- Brightness and Contrast -->
-    	<key type="b" name="brightness-and-contrast">
-        	<default>true</default>
-        	<summary>Applies a Clutter Brightness and Contrast effect</summary>
-        	<description>Applies a Clutter Brightness and Contrast effect</description>
-    	</key>
-    	<key type="d" name="brightness-and-contrast-set-brightness">
-        	<default>-0.3</default>
-        	<summary>Brightness factor factor</summary>
-        	<description>Brightness factor (-1 to 1; 0 = no change)</description>
-    	</key>
-    	<key type="d" name="brightness-and-contrast-set-contrast">
-        	<default>-0.3</default>
-        	<summary>Contrast factor</summary>
-        	<description>Contrast factor (-1 to 1; 0 = no change)</description>
-    	</key>
-    	
-    	<!-- Blur -->
-    	<key type="b" name="blur">
-        	<default>true</default>
-        	<summary>Applies a Clutter Blur effect</summary>
-        	<description>Applies a Clutter Blur effect</description>
-    	</key>
-    	
-    	<!-- Overview -->
-    	<key type="b" name="overview">
-        	<default>true</default>
-        	<summary>Applies the effects to the Overview background</summary>
-        	<description>Applies the effects to the Overview background</description>
-    	</key>
-	</schema>
+  <schema path="/org/gnome/shell/extensions/wbe/" id="org.gnome.shell.extensions.wbe">
+    <!-- Desature -->
+    <key type="b" name="desaturate">
+      <default>true</default>
+      <summary>Applies a Clutter Desaturate effect</summary>
+      <description>Applies a Clutter Desaturate effect</description>
+    </key>
+    <key type="d" name="desaturate-set-factor">
+      <default>1</default>
+      <summary>Desature factor</summary>
+      <description>Desature factor (0=none; 1=full)</description>
+    </key>
+
+    <!-- Brightness and Contrast -->
+    <key type="b" name="brightness-and-contrast">
+      <default>true</default>
+      <summary>Applies a Clutter Brightness and Contrast effect</summary>
+      <description>Applies a Clutter Brightness and Contrast effect</description>
+    </key>
+    <key type="d" name="brightness-and-contrast-set-brightness">
+      <default>-0.3</default>
+      <summary>Brightness factor factor</summary>
+      <description>Brightness factor (-1 to 1; 0 = no change)</description>
+    </key>
+    <key type="d" name="brightness-and-contrast-set-contrast">
+      <default>-0.3</default>
+      <summary>Contrast factor</summary>
+      <description>Contrast factor (-1 to 1; 0 = no change)</description>
+    </key>
+
+    <!-- Blur -->
+    <key type="b" name="blur">
+      <default>true</default>
+      <summary>Applies a Clutter Blur effect</summary>
+      <description>Applies a Clutter Blur effect</description>
+    </key>
+
+    <!-- Overview -->
+    <key type="b" name="overview">
+      <default>true</default>
+      <summary>Applies the effects to the Overview background</summary>
+      <description>Applies the effects to the Overview background</description>
+    </key>
+  </schema>
 </schemalist>
