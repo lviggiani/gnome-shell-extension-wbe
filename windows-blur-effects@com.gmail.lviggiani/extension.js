@@ -49,6 +49,8 @@ var focusAppConnection, switchWorkspaceConnection, trackedWindowsChangedConnecti
 
 var isExtensionEnabled = false;
 
+var separateBlurOnEachScreen = true;
+
 const settings = Shared.getSettings(Shared.SCHEMA_NAME, extension.dir.get_child('schemas').get_path());
 
 const _shadeBackgrounds = Main.overview._shadeBackgrounds;
@@ -143,7 +145,9 @@ function updateWindows(app){
 		if (!actor) continue;
 		
 		// Fix for issue #4: ignore windows on other screens
-		if (window.get_monitor()!=activeMonitor) continue;
+		// …if setting is enabled (fix for issue #13)
+		if (separateBlurOnEachScreen && window.get_monitor()!=activeMonitor)
+			continue;
 		
 		var flag = (actor!=activeActor) && isExtensionEnabled;
 		
@@ -217,5 +221,8 @@ function loadSettings(){
 			}
 		}
 	}
+	
+	separateBlurOnEachScreen =
+		settings.get_boolean("separate-blur-on-each-screen");
 }
 
