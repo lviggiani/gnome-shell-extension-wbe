@@ -117,6 +117,7 @@ function buildPrefsWidget(){
 	}
 
 	addPrefWidget(ret, "overview", _("Apply to Overview"), null, null);
+	addPrefWidget(ret, "separate-blur-on-each-screen", _("Do not blur last active window on each screen"), null, null);
 	ret.show_all();
 	return ret;
 }
