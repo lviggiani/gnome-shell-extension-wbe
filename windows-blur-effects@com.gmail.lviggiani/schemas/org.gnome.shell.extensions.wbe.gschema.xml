@@ -43,5 +43,12 @@
       <summary>Applies the effects to the Overview background</summary>
       <description>Applies the effects to the Overview background</description>
     </key>
+    
+    <!-- Multiple screens behavior -->
+    <key type="b" name="separate-blur-on-each-screen">
+      <default>true</default>
+      <summary>Do not blur last active window on each screen</summary>
+      <description>Do not blur last active window on each screen. If disabled, only the currently active window of all screens will not be blurred.</description>
+    </key>
   </schema>
 </schemalist>
