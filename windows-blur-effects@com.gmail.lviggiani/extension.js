@@ -39,7 +39,7 @@ const Shared = extension.imports.shared;
 
 const display = global.display;
 
-const specialApps = /(Gimp.*)/; // Regexp for wm-classes to exclude form effects
+const specialApps = /(Gimp.*)(Docky)/; // Regexp for wm-classes to exclude form effects
 const excludeList = []; // an array of wm-class to be excluded from filters
 
 const filters = extension.imports.shared.filters;

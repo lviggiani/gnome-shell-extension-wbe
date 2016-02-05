@@ -23,6 +23,10 @@ https://github.com/paradoxxxzero/gnome-shell-focus-effects-extension
 
 CHANGES:
 
+Version 9:
+- Added support to Docky
+- Various translations
+
 Version 8:
 - Apply filters to the Overview mode desktop
 
