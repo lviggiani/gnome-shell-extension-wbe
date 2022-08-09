@@ -27,6 +27,7 @@
  *
  */
 
+const shellVersion = Number.parseInt(imports.misc.config.PACKAGE_VERSION.split('.')[0]);
 const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -158,7 +159,9 @@ function updateWindows(app){
 		flag = flag && (window.window_type!=Meta.WindowType.DESKTOP);
 		
 		// Fix issue #11: Prevent vertically maximized windows from being blurred
-		flag = flag && (window.get_maximized()!=Meta.MaximizeFlags.VERTICAL);
+		if (shellVersion < 40) {
+			flag = flag && (window.get_maximized()!=Meta.MaximizeFlags.VERTICAL);
+		}
 		
 		// Skip always-above windows
         flag = flag && (window.above!=true);

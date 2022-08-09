@@ -28,6 +28,7 @@
  */
 
 const Gtk = imports.gi.Gtk;
+const gtkVersion = Gtk.get_major_version();
 const ExtensionUtils = imports.misc.extensionUtils;
 
 const extension = ExtensionUtils.getCurrentExtension();
@@ -47,10 +48,18 @@ function init(){
 
 function addPrefWidget(parent, key, label, widgets, methods){
 	
-	var exp = new Gtk.Expander({
+	var exp = new Gtk.Expander(gtkVersion < 4 ? {
 		label : _(label),
 		expanded : true,
 		margin : 6,
+		hexpand : true
+	} : {
+		label : _(label),
+		expanded : true,
+		margin_top : 6,
+		margin_bottom : 6,
+		margin_start : 6,
+		margin_end : 6,
 		hexpand : true
 	});
 
@@ -58,7 +67,11 @@ function addPrefWidget(parent, key, label, widgets, methods){
 		orientation : Gtk.Orientation.HORIZONTAL,
 		spacing : 50
 	});
-	exp.add(hbox);
+	if (gtkVersion < 4) {
+		exp.add(hbox);
+	} else {
+		exp.set_child(hbox);
+	}
 
 	var sw = new Gtk.Switch({
 		active : settings.get_boolean(key),
@@ -73,7 +86,11 @@ function addPrefWidget(parent, key, label, widgets, methods){
 		enableGroup(widget);
 	});
 
-	hbox.pack_end(sw, false, false, 0);
+	if (gtkVersion < 4) {
+		hbox.pack_end(sw, false, false, 0);
+	} else {
+		hbox.append(sw);
+	}
 
 	if (widgets) {
 		for (var i = 0; i < widgets.length; i++) {
@@ -88,28 +105,43 @@ function addPrefWidget(parent, key, label, widgets, methods){
 			switch (w.constructor.name) {
 			case "Gtk_Scale":
 				w.set_value(settings.get_double(kk));
-				w.connect('format-value', function(widget, value) {
-					return Math.round(value * 100) + "%";
-				});
-
+				if (gtkVersion < 4) {
+					w.connect('format-value', function(widget, value) {
+						return Math.round(value * 100) + "%";
+					});
+				} else {
+					w.set_draw_value(true);
+					w.set_format_value_func(function(widget, value) {
+						return Math.round(value * 100) + "%                        ";
+					});
+				}
 				w.connect('value-changed', function(widget) {
 					settings.set_double(widget.name, widget.get_value());
 				});
 				break;
 			}
 
-			hbox.pack_start(w, true, true, 0);
+			if (gtkVersion < 4) {
+				hbox.pack_start(w, true, true, 0);
+			} else {
+				hbox.prepend(w);
+			}
 		}
 	}
 
 	enableGroup(sw);
 
-	parent.add(exp);
+	if (gtkVersion < 4) {
+		parent.add(exp);
+	} else {
+		parent.append(exp);
+	}
 }
 
 function buildPrefsWidget(){
 	
-	var ret = new Gtk.Grid({orientation: Gtk.Orientation.VERTICAL, margin_bottom: 50});
+	var ret = (gtkVersion < 4) ? new Gtk.Grid({orientation: Gtk.Orientation.VERTICAL, margin_bottom: 50}) 
+		: new Gtk.Box({orientation: Gtk.Orientation.VERTICAL, spacing: 25});
 	
 	for (var co=0; co<filters.length; co++){
 		var key = filters[co].name.toLowerCase().replace(/\s/g, "-");
@@ -118,13 +150,25 @@ function buildPrefsWidget(){
 
 	addPrefWidget(ret, "overview", _("Apply to Overview"), null, null);
 	addPrefWidget(ret, "separate-blur-on-each-screen", _("Do not blur last active window on each screen"), null, null);
-	ret.show_all();
+	if (gtkVersion < 4) {
+		ret.show_all();
+	}
 	return ret;
 }
 
 function enableGroup(widget){
-	widget.parent.foreach(function(w){
-		if (w!=widget)
-			w.sensitive = widget.active;
-	});
+	if (gtkVersion < 4) {
+		widget.parent.foreach(function(w){
+			if (w!=widget)
+				w.sensitive = widget.active;
+		});
+	} else {
+		var w = widget.parent.get_first_child();
+		while (w) {
+			if (w!=widget) {
+				w.sensitive = widget.active;
+			}
+			w = w.get_next_sibling();
+		}
+    }
 }
