@@ -7,9 +7,9 @@ const GLib = imports.gi.GLib;
 const Gettext = imports.gettext.domain('windows-blur-effects');
 const _ = Gettext.gettext;
 
-const SCHEMA_NAME = "org.gnome.shell.extensions.wbe";
+var SCHEMA_NAME = "org.gnome.shell.extensions.wbe";
 
-const filters = [
+var filters = [
          { 
         	 name: _("Desaturate"),
         	 effect: Clutter.DesaturateEffect,
